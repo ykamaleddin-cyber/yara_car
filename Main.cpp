@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -14,17 +14,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void drawCube(glm::mat4 model, glm::mat4 view, glm::mat4 proj, GLuint program, glm::vec3 color)
+void drawCube(glm::mat4 model, glm::mat4 view, glm::mat4 proj, GLuint program, glm::vec4 color)
 {
     glm::mat4 mvp = proj * view * model;
     glUniformMatrix4fv(glGetUniformLocation(program, "uMVP"), 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniform3f(glGetUniformLocation(program, "uColor"), color.r, color.g, color.b);
+    glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniform4f(glGetUniformLocation(program, "uColor"),
+        color.r, color.g, color.b, color.a);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 int main()
 {
-    // ===== GLFW Init =====
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -47,28 +48,100 @@ int main()
     // ===== Shader =====
     const char* vsSrc = R"(
         #version 330 core
-        layout (location = 0) in vec3 aPos;
+        layout(location = 0) in vec3 aPos;
+        layout(location = 1) in vec3 aNormal;
+
         uniform mat4 uMVP;
-        void main() { gl_Position = uMVP * vec4(aPos, 1.0); }
+        uniform mat4 model;
+
+        out vec3 FragPos;
+        out vec3 Normal;
+
+        void main()
+        {
+            FragPos = vec3(model * vec4(aPos, 1.0));
+            Normal = mat3(transpose(inverse(model))) * aNormal;
+            gl_Position = uMVP * vec4(aPos, 1.0);
+        }
     )";
 
     const char* fsSrc = R"(
         #version 330 core
         out vec4 FragColor;
-        uniform vec3 uColor;
-        void main() { FragColor = vec4(uColor, 1.0); }
+
+        in vec3 FragPos;
+        in vec3 Normal;
+
+        uniform vec3 lightPos;
+        uniform vec3 viewPos;
+        uniform vec4 uColor;
+
+        void main()
+        {
+            vec3 norm = normalize(Normal);
+            vec3 lightDir = normalize(lightPos - FragPos);
+            float diff = max(dot(norm, lightDir), 0.0);
+
+            vec3 viewDir = normalize(viewPos - FragPos);
+            vec3 reflectDir = reflect(-lightDir, norm);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+
+            float ambientFactor = 0.3; // السقف والأشياء تظهر واضحة
+            vec3 ambient = ambientFactor * vec3(uColor);
+            vec3 diffuse = diff * vec3(uColor);
+            vec3 specular = spec * vec3(1.0);
+
+            vec3 result = ambient + diffuse + specular;
+            FragColor = vec4(result, uColor.a);
+        }
     )";
 
     GLuint program = createProgram(vsSrc, fsSrc);
 
-    // ===== Cube Vertices =====
+    // ===== Cube Vertices (positions + normals) =====
     float cubeVertices[] = {
-        -0.5f,-0.5f,-0.5f,  0.5f,-0.5f,-0.5f,  0.5f,0.5f,-0.5f,  -0.5f,-0.5f,-0.5f,  0.5f,0.5f,-0.5f, -0.5f,0.5f,-0.5f,
-        -0.5f,-0.5f,0.5f,   0.5f,-0.5f,0.5f,   0.5f,0.5f,0.5f,   -0.5f,-0.5f,0.5f,   0.5f,0.5f,0.5f, -0.5f,0.5f,0.5f,
-        -0.5f,0.5f,0.5f,   -0.5f,0.5f,-0.5f,  -0.5f,-0.5f,-0.5f,  -0.5f,-0.5f,-0.5f,  -0.5f,-0.5f,0.5f, -0.5f,0.5f,0.5f,
-         0.5f,0.5f,0.5f,    0.5f,0.5f,-0.5f,   0.5f,-0.5f,-0.5f,   0.5f,-0.5f,-0.5f,   0.5f,-0.5f,0.5f,  0.5f,0.5f,0.5f,
-        -0.5f,-0.5f,-0.5f,   0.5f,-0.5f,-0.5f,   0.5f,-0.5f,0.5f,  -0.5f,-0.5f,-0.5f,   0.5f,-0.5f,0.5f, -0.5f,-0.5f,0.5f,
-        -0.5f,0.5f,-0.5f,    0.5f,0.5f,-0.5f,   0.5f,0.5f,0.5f,  -0.5f,0.5f,-0.5f,   0.5f,0.5f,0.5f, -0.5f,0.5f,0.5f
+        // positions           // normals
+        -0.5f,-0.5f,-0.5f,     0,0,-1,
+         0.5f,-0.5f,-0.5f,     0,0,-1,
+         0.5f, 0.5f,-0.5f,     0,0,-1,
+        -0.5f,-0.5f,-0.5f,     0,0,-1,
+         0.5f, 0.5f,-0.5f,     0,0,-1,
+        -0.5f, 0.5f,-0.5f,     0,0,-1,
+
+        -0.5f,-0.5f,0.5f,      0,0,1,
+         0.5f,-0.5f,0.5f,      0,0,1,
+         0.5f, 0.5f,0.5f,      0,0,1,
+        -0.5f,-0.5f,0.5f,      0,0,1,
+         0.5f, 0.5f,0.5f,      0,0,1,
+        -0.5f, 0.5f,0.5f,      0,0,1,
+
+        -0.5f,0.5f,0.5f,       -1,0,0,
+        -0.5f,0.5f,-0.5f,      -1,0,0,
+        -0.5f,-0.5f,-0.5f,     -1,0,0,
+        -0.5f,-0.5f,-0.5f,     -1,0,0,
+        -0.5f,-0.5f,0.5f,      -1,0,0,
+        -0.5f,0.5f,0.5f,       -1,0,0,
+
+         0.5f,0.5f,0.5f,       1,0,0,
+         0.5f,0.5f,-0.5f,      1,0,0,
+         0.5f,-0.5f,-0.5f,     1,0,0,
+         0.5f,-0.5f,-0.5f,     1,0,0,
+         0.5f,-0.5f,0.5f,      1,0,0,
+         0.5f,0.5f,0.5f,       1,0,0,
+
+        -0.5f,-0.5f,-0.5f,     0,-1,0,
+         0.5f,-0.5f,-0.5f,     0,-1,0,
+         0.5f,-0.5f,0.5f,      0,-1,0,
+        -0.5f,-0.5f,-0.5f,     0,-1,0,
+         0.5f,-0.5f,0.5f,      0,-1,0,
+        -0.5f,-0.5f,0.5f,      0,-1,0,
+
+        -0.5f,0.5f,-0.5f,      0,1,0,
+         0.5f,0.5f,-0.5f,      0,1,0,
+         0.5f,0.5f,0.5f,       0,1,0,
+        -0.5f,0.5f,-0.5f,      0,1,0,
+         0.5f,0.5f,0.5f,       0,1,0,
+        -0.5f,0.5f,0.5f,       0,1,0
     };
 
     GLuint VAO, VBO;
@@ -77,8 +150,12 @@ int main()
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -94,35 +171,33 @@ int main()
         glm::mat4 proj = glm::perspective(glm::radians(60.0f), 1.0f, 0.1f, 100.0f);
 
         glUseProgram(program);
+        glUniform3f(glGetUniformLocation(program, "lightPos"), 0.0f, 3.0f, 0.0f);
+        glUniform3f(glGetUniformLocation(program, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
         // ===== Room =====
-        glm::mat4 floorM = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-        floorM = glm::scale(floorM, glm::vec3(10.0f, 0.05f, 6.0f));
-        drawCube(floorM, view, proj, program, glm::vec3(0.6f, 0.6f, 0.6f));
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,-1,0 }), { 10,0.05f,6 }),
+            view, proj, program, { 0.6f,0.6f,0.6f,1 });
 
-        glm::mat4 ceilingM = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.0f, 0.0f));
-        ceilingM = glm::scale(ceilingM, glm::vec3(10.0f, 0.05f, 6.0f));
-        drawCube(ceilingM, view, proj, program, glm::vec3(0.6f, 0.6f, 0.6f));
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,3,0 }), { 10,0.05f,6 }),
+            view, proj, program, { 0.6f,0.6f,0.6f,1 });
 
-        // Walls
-        glm::mat4 backWall = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, -3.0f));
-        backWall = glm::scale(backWall, glm::vec3(10.0f, 2.0f, 0.05f));
-        drawCube(backWall, view, proj, program, glm::vec3(0.8f, 0.8f, 0.85f));
-        glm::mat4 frontWall = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 3.0f));
-        frontWall = glm::scale(frontWall, glm::vec3(10.0f, 2.0f, 0.05f));
-        drawCube(frontWall, view, proj, program, glm::vec3(0.8f, 0.8f, 0.85f));
-        glm::mat4 leftWall = glm::translate(glm::mat4(1.0f), glm::vec3(-5.0f, 1.0f, 0.0f));
-        leftWall = glm::scale(leftWall, glm::vec3(0.05f, 2.0f, 6.0f));
-        drawCube(leftWall, view, proj, program, glm::vec3(0.85f, 0.85f, 0.8f));
-        glm::mat4 rightWall = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f, 1.0f, 0.0f));
-        rightWall = glm::scale(rightWall, glm::vec3(0.05f, 2.0f, 6.0f));
-        drawCube(rightWall, view, proj, program, glm::vec3(0.85f, 0.85f, 0.8f));
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,1,-3 }), { 10,2,0.05f }),
+            view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,1,3 }), { 10,2,0.05f }),
+            view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { -5,1,0 }), { 0.05f,2,6 }),
+            view, proj, program, { 0.85f,0.85f,0.8f,1 });
+
+        drawCube(glm::scale(glm::translate(glm::mat4(1), { 5,1,0 }), { 0.05f,2,6 }),
+            view, proj, program, { 0.85f,0.85f,0.8f,1 });
 
         // ===== Windows =====
         glm::vec3 windows[] = {
-            {-3.0f, 1.5f, -2.975f}, {0.0f,1.5f,-2.975f}, {3.0f,1.5f,-2.975f}, // Back wall
-            {-4.975f,1.5f,-2.0f}, {-4.975f,1.5f,2.0f}, // Left wall
-            {4.975f,1.5f,-2.0f}, {4.975f,1.5f,2.0f}   // Right wall
+            {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f},
+            {-4.975f,1.5f,-2},{-4.975f,1.5f,2},
+            {4.975f,1.5f,-2},{4.975f,1.5f,2}
         };
 
         for (int i = 0; i < 7; i++)
@@ -130,36 +205,31 @@ int main()
             glm::mat4 win = glm::translate(glm::mat4(1.0f), windows[i]);
             if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
             else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
-            drawCube(win, view, proj, program, glm::vec3(0.3f, 0.6f, 0.8f));
 
-            // ===== Windows Reflection =====
-          /*  glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(windows[i].x, -1.0f, windows[i].z));
-            if (i < 3) refl = glm::scale(refl, glm::vec3(1.5f, -1.0f, 0.05f));
-            else refl = glm::scale(refl, glm::vec3(0.05f, -1.0f, 1.5f));
-            drawCube(refl, view, proj, program, glm::vec3(0.3f, 0.6f, 0.8f) * 0.4f);*/
+            drawCube(win, view, proj, program, glm::vec4(0.3f, 0.6f, 0.8f, 0.4f));
 
             glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(windows[i].x, -0.98f, windows[i].z));
-            if (i < 3) refl = glm::scale(refl, glm::vec3(1.5f, 0.15f, 0.05f));
-            else refl = glm::scale(refl, glm::vec3(0.05f, 0.19f, 1.5f));
-            drawCube(refl, view, proj, program, glm::vec3(0.3f, 0.6f, 0.8f) * 0.3f);
+            if (i < 3) refl = glm::scale(refl, glm::vec3(1.5f, 0.18f, 0.05f));
+            else refl = glm::scale(refl, glm::vec3(0.05f, 0.18f, 1.5f));
+
+            drawCube(refl, view, proj, program, glm::vec4(0.3f, 0.6f, 0.8f, 0.18f));
         }
 
-        // ===== Lamps Between Windows =====
-        glm::vec3 lampPos[] = { {-4.9f,1.5f,-1.0f}, {-4.9f,1.5f,1.0f}, {4.9f,1.5f,-1.0f}, {4.9f,1.5f,1.0f} };
+        // ===== Lamps =====
+        glm::vec3 lampPos[] = {
+            {-4.9f,1.5f,-1.0f}, {-4.9f,1.5f,1.0f},
+            {4.9f,1.5f,-1.0f},  {4.9f,1.5f,1.0f}
+        };
+
         for (int i = 0; i < 4; i++)
         {
             glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos[i]);
             lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
-            drawCube(lamp, view, proj, program, glm::vec3(1.0f, 1.0f, 0.8f));
-
-            // Lamp Reflection
-          /*  glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(lampPos[i].x, -1.0f, lampPos[i].z));
-            refl = glm::scale(refl, glm::vec3(0.1f, -0.4f, 0.05f));
-            drawCube(refl, view, proj, program, glm::vec3(1.0f, 1.0f, 0.8f) * 0.4f);*/
+            drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
 
             glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(lampPos[i].x, -0.98f, lampPos[i].z));
             refl = glm::scale(refl, glm::vec3(0.1f, 0.19f, 0.05f));
-            drawCube(refl, view, proj, program, glm::vec3(1.0f, 1.0f, 0.8f) * 0.3f);
+            drawCube(refl, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 0.3f));
         }
 
         glfwSwapBuffers(window);
