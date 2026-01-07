@@ -141,73 +141,182 @@ int main()
         glUniform3f(glGetUniformLocation(program, "lightPos"), 0.0f, 3.0f, 0.0f);
         glUniform3f(glGetUniformLocation(program, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
-        glm::vec3 room1Offset(0, 0, 0);
-        glm::vec3 room2Offset(10, 0, 0); 
-        glm::vec3 room3Offset(20, 0, 0);
-
-        auto drawRoom = [&](glm::vec3 offset)
+        auto drawRooms = [&]()
             {
              
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + offset), glm::vec3(10, 0.05f, 6)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + glm::vec3(0, 0, 0)), glm::vec3(10, 0.05f, 6)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + offset), glm::vec3(10, 0.05f, 6)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + glm::vec3(0, 0, 0)), glm::vec3(10, 0.05f, 6)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });         
 
-                float doorW = 2.0f, doorH = 2.0f, t = 0.05f;
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-2.5f, 1, 3) + offset), glm::vec3(3, 2, t)),
+                float doorW1 = 2.0f, doorH1 = 2.0f, t1 = 0.05f;
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-2.5f, 1, 3) + glm::vec3(0, 0, 0)), glm::vec3(3, 2, t1)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(2.5f, 1, 3) + offset), glm::vec3(3, 2, t)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(2.5f, 1, 3) + glm::vec3(0, 0, 0)), glm::vec3(3, 2, t1)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 3) + offset), glm::vec3(doorW, 1, t)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 3) + glm::vec3(0, 0, 0)), glm::vec3(doorW1, 1, t1)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
 
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + offset), glm::vec3(0.05f, 2, 2)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + offset), glm::vec3(0.05f, 2, 2)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 0) + offset), glm::vec3(0.05f, 2, doorW)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 0) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, doorW1)),
                     view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, -2) + offset), glm::vec3(0.05f, 2, 2)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, -2) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) + offset), glm::vec3(0.05f, 2, 2)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) + offset), glm::vec3(0.05f, 2, doorW)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) + glm::vec3(0, 0, 0)), glm::vec3(0.05f, 2, doorW1)),
                     view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, 3.0f) + offset), glm::vec3(doorW, doorH, t)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, 3.0f) + glm::vec3(0, 0, 0)), glm::vec3(doorW1, doorH1, t1)),
                     view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
 
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, -3) + offset), glm::vec3(10, 2, 0.05f)),
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, -3) + glm::vec3(0, 0, 0)), glm::vec3(10, 2, 0.05f)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
 
-                glm::vec3 windows[] = {
+                glm::vec3 windows1[] = {
                     {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
                 };
                 for (int i = 0; i < 3; i++)
                 {
-                    glm::mat4 win = glm::translate(glm::mat4(1.0f), windows[i] + offset);
+                    glm::mat4 win = glm::translate(glm::mat4(1.0f), windows1[i] + glm::vec3(0, 0, 0));
                     if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
                     else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
                     drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
                 }
               
-                glm::vec3 lampPos[] = {
+                glm::vec3 lampPos1[] = {
       {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
                 };
                 for (int i = 0; i < 2; i++)
                 {
-                    glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos[i] + offset);
+                    glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos1[i] + glm::vec3(0, 0, 0));
                     lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
                     drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
                 }
 
+
+
+
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.05f, 6)),
+                    view, proj, program, { 0.6f,0.6f,0.6f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.05f, 6)),
+                    view, proj, program, { 0.6f,0.6f,0.6f,1 });
+
+                float doorW2 = 2.0f, doorH2 = 2.0f, t2 = 0.05f;
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-2.5f, 1, 3) + glm::vec3(10, 0, 0)), glm::vec3(3, 2, t2)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(2.5f, 1, 3) + glm::vec3(10, 0, 0)), glm::vec3(3, 2, t2)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 3) + glm::vec3(10, 0, 0)), glm::vec3(doorW2, 1, t2)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 0) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, doorW2)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, -2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, doorW2)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, 3.0f) + glm::vec3(10, 0, 0)), glm::vec3(doorW2, doorH2, t2)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, -3) + glm::vec3(10, 0, 0)), glm::vec3(10, 2, 0.05f)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+                glm::vec3 windows2[] = {
+                    {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
+                };
+                for (int i = 0; i < 3; i++)
+                {
+                    glm::mat4 win = glm::translate(glm::mat4(1.0f), windows2[i] + glm::vec3(10, 0, 0));
+                    if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
+                    else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                    drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                }
+
+                glm::vec3 lampPos2[] = {
+      {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
+                };
+                for (int i = 0; i < 2; i++)
+                {
+                    glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos2[i] + glm::vec3(10, 0, 0));
+                    lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
+                    drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
+                }
+
+
+
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.05f, 6)),
+                        view, proj, program, { 0.6f,0.6f,0.6f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.05f, 6)),
+                        view, proj, program, { 0.6f,0.6f,0.6f,1 });
+
+                    float doorW3 = 2.0f, doorH3 = 2.0f, t3 = 0.05f;
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-2.5f, 1, 3) + glm::vec3(20, 0, 0)), glm::vec3(3, 2, t3)),
+                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(2.5f, 1, 3) + glm::vec3(20, 0, 0)), glm::vec3(3, 2, t3)),
+                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 3) + glm::vec3(20, 0, 0)), glm::vec3(doorW3, 1, t3)),
+                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                        view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                        view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 0) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, doorW3)),
+                        view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, -2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                        view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
+                        view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, doorW3)),
+                        view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, 3.0f) + glm::vec3(20, 0, 0)), glm::vec3(doorW3, doorH3, t3)),
+                        view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
+
+
+                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, -3) + glm::vec3(20, 0, 0)), glm::vec3(10, 2, 0.05f)),
+                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
+
+                    glm::vec3 windows3[] = {
+                        {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
+                    };
+                    for (int i = 0; i < 3; i++)
+                    {
+                        glm::mat4 win = glm::translate(glm::mat4(1.0f), windows3[i] + glm::vec3(20, 0, 0));
+                        if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
+                        else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                        drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                    }
+
+                    glm::vec3 lampPos3[] = {
+          {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
+                    };
+                    for (int i = 0; i < 2; i++)
+                    {
+                        glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos3[i] + glm::vec3(20, 0, 0));
+                        lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
+                        drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
+                    }
             };
 
-        drawRoom(room1Offset);
-        drawRoom(room2Offset);    
-        drawRoom(room3Offset);
+                    drawRooms();
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
