@@ -31,7 +31,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 800, "Car Showroom", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1600, 800, "Car Showroom - Double Rooms", nullptr, nullptr);
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -45,7 +45,6 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // ===== Shader =====
     const char* vsSrc = R"(
         #version 330 core
         layout(location = 0) in vec3 aPos;
@@ -86,7 +85,7 @@ int main()
             vec3 reflectDir = reflect(-lightDir, norm);
             float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-            float ambientFactor = 0.3; // السقف والأشياء تظهر واضحة
+            float ambientFactor = 0.3;
             vec3 ambient = ambientFactor * vec3(uColor);
             vec3 diffuse = diff * vec3(uColor);
             vec3 specular = spec * vec3(1.0);
@@ -98,50 +97,19 @@ int main()
 
     GLuint program = createProgram(vsSrc, fsSrc);
 
-    // ===== Cube Vertices (positions + normals) =====
     float cubeVertices[] = {
-        // positions           // normals
-        -0.5f,-0.5f,-0.5f,     0,0,-1,
-         0.5f,-0.5f,-0.5f,     0,0,-1,
-         0.5f, 0.5f,-0.5f,     0,0,-1,
-        -0.5f,-0.5f,-0.5f,     0,0,-1,
-         0.5f, 0.5f,-0.5f,     0,0,-1,
-        -0.5f, 0.5f,-0.5f,     0,0,-1,
-
-        -0.5f,-0.5f,0.5f,      0,0,1,
-         0.5f,-0.5f,0.5f,      0,0,1,
-         0.5f, 0.5f,0.5f,      0,0,1,
-        -0.5f,-0.5f,0.5f,      0,0,1,
-         0.5f, 0.5f,0.5f,      0,0,1,
-        -0.5f, 0.5f,0.5f,      0,0,1,
-
-        -0.5f,0.5f,0.5f,       -1,0,0,
-        -0.5f,0.5f,-0.5f,      -1,0,0,
-        -0.5f,-0.5f,-0.5f,     -1,0,0,
-        -0.5f,-0.5f,-0.5f,     -1,0,0,
-        -0.5f,-0.5f,0.5f,      -1,0,0,
-        -0.5f,0.5f,0.5f,       -1,0,0,
-
-         0.5f,0.5f,0.5f,       1,0,0,
-         0.5f,0.5f,-0.5f,      1,0,0,
-         0.5f,-0.5f,-0.5f,     1,0,0,
-         0.5f,-0.5f,-0.5f,     1,0,0,
-         0.5f,-0.5f,0.5f,      1,0,0,
-         0.5f,0.5f,0.5f,       1,0,0,
-
-        -0.5f,-0.5f,-0.5f,     0,-1,0,
-         0.5f,-0.5f,-0.5f,     0,-1,0,
-         0.5f,-0.5f,0.5f,      0,-1,0,
-        -0.5f,-0.5f,-0.5f,     0,-1,0,
-         0.5f,-0.5f,0.5f,      0,-1,0,
-        -0.5f,-0.5f,0.5f,      0,-1,0,
-
-        -0.5f,0.5f,-0.5f,      0,1,0,
-         0.5f,0.5f,-0.5f,      0,1,0,
-         0.5f,0.5f,0.5f,       0,1,0,
-        -0.5f,0.5f,-0.5f,      0,1,0,
-         0.5f,0.5f,0.5f,       0,1,0,
-        -0.5f,0.5f,0.5f,       0,1,0
+        -0.5f,-0.5f,-0.5f, 0,0,-1,  0.5f,-0.5f,-0.5f, 0,0,-1,  0.5f,0.5f,-0.5f, 0,0,-1,
+        -0.5f,-0.5f,-0.5f, 0,0,-1,  0.5f,0.5f,-0.5f, 0,0,-1, -0.5f,0.5f,-0.5f, 0,0,-1,
+        -0.5f,-0.5f,0.5f, 0,0,1,  0.5f,-0.5f,0.5f, 0,0,1,  0.5f,0.5f,0.5f, 0,0,1,
+        -0.5f,-0.5f,0.5f, 0,0,1,  0.5f,0.5f,0.5f, 0,0,1, -0.5f,0.5f,0.5f, 0,0,1,
+        -0.5f,0.5f,0.5f,-1,0,0, -0.5f,0.5f,-0.5f,-1,0,0, -0.5f,-0.5f,-0.5f,-1,0,0,
+        -0.5f,-0.5f,-0.5f,-1,0,0, -0.5f,-0.5f,0.5f,-1,0,0, -0.5f,0.5f,0.5f,-1,0,0,
+         0.5f,0.5f,0.5f,1,0,0, 0.5f,0.5f,-0.5f,1,0,0, 0.5f,-0.5f,-0.5f,1,0,0,
+         0.5f,-0.5f,-0.5f,1,0,0, 0.5f,-0.5f,0.5f,1,0,0, 0.5f,0.5f,0.5f,1,0,0,
+        -0.5f,-0.5f,-0.5f,0,-1,0, 0.5f,-0.5f,-0.5f,0,-1,0, 0.5f,-0.5f,0.5f,0,-1,0,
+        -0.5f,-0.5f,-0.5f,0,-1,0, 0.5f,-0.5f,0.5f,0,-1,0, -0.5f,-0.5f,0.5f,0,-1,0,
+        -0.5f,0.5f,-0.5f,0,1,0, 0.5f,0.5f,-0.5f,0,1,0, 0.5f,0.5f,0.5f,0,1,0,
+        -0.5f,0.5f,-0.5f,0,1,0, 0.5f,0.5f,0.5f,0,1,0, -0.5f,0.5f,0.5f,0,1,0
     };
 
     GLuint VAO, VBO;
@@ -153,7 +121,6 @@ int main()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
@@ -168,69 +135,82 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        glm::mat4 proj = glm::perspective(glm::radians(60.0f), 1.0f, 0.1f, 100.0f);
+        glm::mat4 proj = glm::perspective(glm::radians(60.0f), 2.0f, 0.1f, 100.0f); 
 
         glUseProgram(program);
         glUniform3f(glGetUniformLocation(program, "lightPos"), 0.0f, 3.0f, 0.0f);
         glUniform3f(glGetUniformLocation(program, "viewPos"), cameraPos.x, cameraPos.y, cameraPos.z);
 
-        // ===== Room =====
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,-1,0 }), { 10,0.05f,6 }),
-            view, proj, program, { 0.6f,0.6f,0.6f,1 });
+        glm::vec3 room1Offset(0, 0, 0);
+        glm::vec3 room2Offset(10, 0, 0); 
+        glm::vec3 room3Offset(20, 0, 0);
 
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,3,0 }), { 10,0.05f,6 }),
-            view, proj, program, { 0.6f,0.6f,0.6f,1 });
+        auto drawRoom = [&](glm::vec3 offset)
+            {
+             
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + offset), glm::vec3(10, 0.05f, 6)),
+                    view, proj, program, { 0.6f,0.6f,0.6f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + offset), glm::vec3(10, 0.05f, 6)),
+                    view, proj, program, { 0.6f,0.6f,0.6f,1 });         
 
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,1,-3 }), { 10,2,0.05f }),
-            view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                float doorW = 2.0f, doorH = 2.0f, t = 0.05f;
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-2.5f, 1, 3) + offset), glm::vec3(3, 2, t)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(2.5f, 1, 3) + offset), glm::vec3(3, 2, t)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 3) + offset), glm::vec3(doorW, 1, t)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
 
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { 0,1,3 }), { 10,2,0.05f }),
-            view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + offset), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + offset), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 0) + offset), glm::vec3(0.05f, 2, doorW)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { -5,1,0 }), { 0.05f,2,6 }),
-            view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, -2) + offset), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) + offset), glm::vec3(0.05f, 2, 2)),
+                    view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) + offset), glm::vec3(0.05f, 2, doorW)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
-        drawCube(glm::scale(glm::translate(glm::mat4(1), { 5,1,0 }), { 0.05f,2,6 }),
-            view, proj, program, { 0.85f,0.85f,0.8f,1 });
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, 3.0f) + offset), glm::vec3(doorW, doorH, t)),
+                    view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
-        // ===== Windows =====
-        glm::vec3 windows[] = {
-            {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f},
-            {-4.975f,1.5f,-2},{-4.975f,1.5f,2},
-            {4.975f,1.5f,-2},{4.975f,1.5f,2}
-        };
 
-        for (int i = 0; i < 7; i++)
-        {
-            glm::mat4 win = glm::translate(glm::mat4(1.0f), windows[i]);
-            if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
-            else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 1, -3) + offset), glm::vec3(10, 2, 0.05f)),
+                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
 
-            drawCube(win, view, proj, program, glm::vec4(0.3f, 0.6f, 0.8f, 0.4f));
+                glm::vec3 windows[] = {
+                    {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
+                };
+                for (int i = 0; i < 3; i++)
+                {
+                    glm::mat4 win = glm::translate(glm::mat4(1.0f), windows[i] + offset);
+                    if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
+                    else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                    drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                }
+              
+                glm::vec3 lampPos[] = {
+      {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
+                };
+                for (int i = 0; i < 2; i++)
+                {
+                    glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos[i] + offset);
+                    lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
+                    drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
+                }
 
-            glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(windows[i].x, -0.98f, windows[i].z));
-            if (i < 3) refl = glm::scale(refl, glm::vec3(1.5f, 0.18f, 0.05f));
-            else refl = glm::scale(refl, glm::vec3(0.05f, 0.18f, 1.5f));
+            };
 
-            drawCube(refl, view, proj, program, glm::vec4(0.3f, 0.6f, 0.8f, 0.18f));
-        }
+        drawRoom(room1Offset);
+        drawRoom(room2Offset);    
+        drawRoom(room3Offset);
 
-        // ===== Lamps =====
-        glm::vec3 lampPos[] = {
-            {-4.9f,1.5f,-1.0f}, {-4.9f,1.5f,1.0f},
-            {4.9f,1.5f,-1.0f},  {4.9f,1.5f,1.0f}
-        };
 
-        for (int i = 0; i < 4; i++)
-        {
-            glm::mat4 lamp = glm::translate(glm::mat4(1.0f), lampPos[i]);
-            lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
-            drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
 
-            glm::mat4 refl = glm::translate(glm::mat4(1.0f), glm::vec3(lampPos[i].x, -0.98f, lampPos[i].z));
-            refl = glm::scale(refl, glm::vec3(0.1f, 0.19f, 0.05f));
-            drawCube(refl, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 0.3f));
-        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
