@@ -209,9 +209,6 @@ int main()
         drawRoom(room2Offset);    
         drawRoom(room3Offset);
 
-
-
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
