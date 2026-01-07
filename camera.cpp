@@ -2,8 +2,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 1.0f, 4.0f);  // √⁄·Ï Ê√»⁄œ ‘ÊÌ
-glm::vec3 cameraFront = glm::vec3(0.0f, -0.1f, -1.0f); // Ì‰Ÿ— ﬁ·Ì·« ≈·Ï «·√”›·
+glm::vec3 cameraPos = glm::vec3(0.0f, 1.0f, 4.0f);  
+glm::vec3 cameraFront = glm::vec3(0.0f, -0.1f, -1.0f); 
 
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -15,6 +15,7 @@ bool firstMouse = true;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
