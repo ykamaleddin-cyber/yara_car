@@ -9,6 +9,18 @@
 #include "shader.h"
 #include "camera.h"
 
+glm::vec3 doorPos1 = glm::vec3(0.26f, 0.0f, 3.025f);
+float doorOpen1 = 0.0f; 
+bool doorOpening1 = false;
+
+glm::vec3 doorPos2 = glm::vec3(10.26f, 0.0f, 3.025f);
+float doorOpen2 = 0.0f;
+bool doorOpening2 = false; 
+
+glm::vec3 doorPos3 = glm::vec3(20.26f, 0.0f, 3.025f);
+float doorOpen3 = 0.0f;
+bool doorOpening3 = false;
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -29,16 +41,46 @@ void drawTree(glm::vec3 pos, glm::mat4 view, glm::mat4 proj, GLuint program)
 {
     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 0.65f, 0.0f)),glm::vec3(0.5f, 2.5f, 0.2f)),  
         view, proj, program, { 0.55f, 0.27f, 0.07f, 1.0f });  
-
     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 1.5f, 0.0f)),glm::vec3(1.1f, 0.7f, 0.9f)), 
         view, proj, program, { 0.0f, 0.6f, 0.0f, 1.0f });
-
     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 2.1f, 0.0f)),glm::vec3(0.9f, 0.7f, 0.8f)),
         view, proj, program, { 0.0f, 0.7f, 0.0f, 1.0f });
-
     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 2.7f, 0.0f)),glm::vec3(0.7f, 0.7f, 0.6f)),
         view, proj, program, { 0.0f, 0.8f, 0.0f, 1.0f });
 }
+
+
+void updateDoor(glm::vec3 doorPos, float& openAmount, bool& isOpening)
+{
+    float dist = glm::distance(cameraPos, doorPos);
+    if (dist < 2.0f)
+        isOpening = true;
+    else if (dist > 3.0f)
+        isOpening = false;
+    if (isOpening && openAmount < 1.0f)
+        openAmount += deltaTime * 1.5f;
+    else if (!isOpening && openAmount > 0.0f)
+        openAmount -= deltaTime * 1.5f;
+}
+void drawSlidingDoor(glm::vec3 pos, float openAmount,
+    glm::mat4 view, glm::mat4 proj, GLuint program)
+{
+    float doorWidth = 3.48f;
+    float doorHeight = 5.0f;
+    float doorThick = 0.05f;
+
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = glm::translate(model, pos);
+
+    float slide = -openAmount * doorWidth;
+    model = glm::translate(model, glm::vec3(slide, 0.0f, 0.0f));
+
+    model = glm::scale(model, glm::vec3(doorWidth, doorHeight, doorThick));
+
+    drawCube(model, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+}
+
 
 int main()
 {
@@ -142,6 +184,10 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        updateDoor(doorPos1, doorOpen1, doorOpening1);
+        updateDoor(doorPos2, doorOpen2, doorOpening2);
+        updateDoor(doorPos3, doorOpen3, doorOpening3);
+
         float time = glfwGetTime();
         deltaTime = time - lastFrame;
         lastFrame = time;
@@ -165,14 +211,13 @@ int main()
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) ), glm::vec3(10, 0.05f, 6)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });         
 
-                float doorW1 = 2.0f, doorH1 = 2.0f, t1 = 0.05f;
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-3.23, 1, 3) ), glm::vec3(3.5, 2, t1)),
-                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) ), glm::vec3(3, 2, t1)),
-                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                float doorW1 = 2.0f, doorH1 = 2.0f;
+                drawCube(glm::scale(glm::translate(glm::mat4(1.0f),glm::vec3(-3.23f, 0.53125f, 3.0f)),glm::vec3(3.5f, 3.0125f, 0.05f)),
+                    view, proj, program,{ 0.8f, 0.8f, 0.85f, 1.0f });
+                drawCube(glm::scale(glm::translate(glm::mat4(1.0f),glm::vec3(3.5f, 0.53125f, 3.0f)),glm::vec3(3.0f, 3.0125f, 0.05f)),
+                    view, proj, program,{ 0.8f, 0.8f, 0.85f, 1.0f });
                 glDepthMask(GL_FALSE);
-                drawCube( glm::scale( glm::translate( glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f)),glm::vec3(3.48f, 2.0f, t1) ),
-                    view, proj, program,{ 0.4f, 0.7f, 0.9f, 0.35f } );
+                drawSlidingDoor(doorPos1, doorOpen1, view, proj, program);
                 glDepthMask(GL_TRUE);
 
 
@@ -205,36 +250,20 @@ int main()
                     view, proj, program,{ 0.8f, 0.8f, 0.85f, 1 } );
 
 
-
-
                 drawCube( glm::scale( glm::translate( glm::mat4(1), glm::vec3(0, -0.49f, -3) ), glm::vec3(10, 0.9f, 0.05f)),
                     view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
                 drawCube( glm::scale( glm::translate( glm::mat4(1), glm::vec3(0, 2.4875f, -3) ), glm::vec3(10, 0.9f, 0.05f) ),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                 drawCube( glm::scale( glm::translate( glm::mat4(1),glm::vec3(-5, 2.4875f, 0) ),glm::vec3(0.05f, 0.9f, 4.0f + doorW1) ),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                 drawCube( glm::scale( glm::translate( glm::mat4(1), glm::vec3(-5, -0.4875f, 0)  ),glm::vec3(0.05f, 0.9f, 4.0f + doorW1) ),
                     view,proj, program, { 0.4f, 0.7f, 0.9f, 0.35f } );
-
-
                 drawCube(glm::scale( glm::translate( glm::mat4(1),glm::vec3(5, 2.4875f, 0)), glm::vec3(0.05f, 0.9f, 6.0f) ),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
                 drawCube( glm::scale(glm::translate( glm::mat4(1), glm::vec3(5, -0.4875f, 0)  ), glm::vec3(0.05f, 0.9f, 6.0f)),
                     view, proj,program,{ 0.4f, 0.7f, 0.9f, 0.35f });
-
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 2.4875f, 3) ), glm::vec3(10.0f, 0.9f, 0.05f) ),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-                    drawCube( glm::scale( glm::translate(glm::mat4(1), glm::vec3(0, -0.4875f, 3) ), glm::vec3(10.0f, 0.9f, 0.05f) ),
-                    view, proj, program,{ 0.4f, 0.7f, 0.9f, 0.35f });
-
                 glm::vec3 windows1[] = {
                     {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
                 };
@@ -247,9 +276,7 @@ int main()
 
                     drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
                     glDepthMask(GL_TRUE);
-
-                }
-              
+                }             
                 glm::vec3 lampPos1[] = {
                 {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
                 };
@@ -260,25 +287,18 @@ int main()
                     drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
                 }
 
-
-
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.05f, 6)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.05f, 6)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-                float doorW2 = 2.0f, doorH2 = 2.0f, t2 = 0.05f;
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-3.23, 1, 3) + glm::vec3(10, 0, 0)), glm::vec3(3.5, 2, t2)),
-                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) + glm::vec3(10, 0, 0)), glm::vec3(3, 2, t2)),
-                    view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                float doorW2 = 2.0f, doorH2 = 2.0f;
+                drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-3.23f, 0.53125f, 3.0f) + glm::vec3(10, 0, 0)), glm::vec3(3.5f, 3.0125f, 0.05f)),
+                    view, proj, program, { 0.8f, 0.8f, 0.85f, 1.0f });
+                drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.5f, 0.53125f, 3.0f) + glm::vec3(10, 0, 0)), glm::vec3(3.0f, 3.0125f, 0.05f)),
+                    view, proj, program, { 0.8f, 0.8f, 0.85f, 1.0f });
                 glDepthMask(GL_FALSE);
-
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f) + glm::vec3(10, 0, 0)), glm::vec3(3.48f, 2.0f, t2)),
-                    view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
+                drawSlidingDoor(doorPos2, doorOpen2, view, proj, program);
                 glDepthMask(GL_TRUE);
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
@@ -310,28 +330,16 @@ int main()
 
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -0.49f, -3) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.9f, 0.05f)),
                     view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 2.4875f, -3) + glm::vec3(10, 0, 0)), glm::vec3(10, 0.9f, 0.05f)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 2.4875f, 0) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 0.9f, 4.0f + doorW1)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 2.4875f, 0) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 0.9f, 6.0f)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, -0.4875f, 0) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 0.9f, 6.0f)),
                     view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
-
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 2.4875f, 3) + glm::vec3(10, 0, 0)), glm::vec3(10.0f, 0.9f, 0.05f)),
                     view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-                drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -0.4875f, 3) + glm::vec3(10, 0, 0)), glm::vec3(10.0f, 0.9f, 0.05f)),
-                    view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
                 glm::vec3 windows2[] = {
                     {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
                 };
@@ -344,9 +352,7 @@ int main()
 
                     drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
                     glDepthMask(GL_TRUE);
-
                 }
-
                 glm::vec3 lampPos2[] = {
                 {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
                 };
@@ -356,26 +362,18 @@ int main()
                     lamp = glm::scale(lamp, glm::vec3(0.1f, 0.4f, 0.05f));
                     drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
                 }
-
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -1, 0) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.05f, 6)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 3, 0) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.05f, 6)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-                    float doorW3 = 2.0f, doorH3 = 2.0f, t3 = 0.05f;
-                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-3.23, 1, 3) + glm::vec3(20, 0, 0)), glm::vec3(3.5, 2, t3)),
-                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
-                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) + glm::vec3(20, 0, 0)), glm::vec3(3, 2, t3)),
-                        view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                    float doorW3 = 2.0f, doorH3 = 2.0f;
+                    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-3.23f, 0.53125f, 3.0f) + glm::vec3(20, 0, 0)), glm::vec3(3.5f, 3.0125f, 0.05f)),
+                        view, proj, program, { 0.8f, 0.8f, 0.85f, 1.0f });
+                    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(3.5f, 0.53125f, 3.0f) + glm::vec3(20, 0, 0)), glm::vec3(3.0f, 3.0125f, 0.05f)),
+                        view, proj, program, { 0.8f, 0.8f, 0.85f, 1.0f });
                     glDepthMask(GL_FALSE);
-
-                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f) + glm::vec3(20, 0, 0)), glm::vec3(3.48f, 2.0f, t3)),
-                        view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
+                    drawSlidingDoor(doorPos3, doorOpen3, view, proj, program);
                     glDepthMask(GL_TRUE);
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
                         view, proj, program, { 0.85f,0.85f,0.8f,1 });
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, 2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
@@ -405,34 +403,19 @@ int main()
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.0f, 0.499f, -3.0f) + glm::vec3(20, 0, 0)), glm::vec3(1.5f, 1.01f, 0.05f)),
                         view, proj, program, { 0.8f, 0.8f, 0.85f, 1 });
 
-
-
-
-
               
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -0.49f, -3) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.9f, 0.05f)),
                         view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 2.4875f, -3) + glm::vec3(20, 0, 0)), glm::vec3(10, 0.9f, 0.05f)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 2.4875f, 0) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 0.9f, 4.0f + doorW1)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 2.4875f, 0) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 0.9f, 6.0f)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, -0.4875f, 0) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 0.9f, 6.0f)),
                         view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, 2.4875f, 3) + glm::vec3(20, 0, 0)), glm::vec3(10.0f, 0.9f, 0.05f)),
                         view, proj, program, { 0.6f,0.6f,0.6f,1 });
-
-                    drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0, -0.4875f, 3) + glm::vec3(20, 0, 0)), glm::vec3(10.0f, 0.9f, 0.05f)),
-                        view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
                     glm::vec3 windows3[] = {
                         {-3,1.5f,-2.975f},{0,1.5f,-2.975f},{3,1.5f,-2.975f}
                     };
@@ -445,9 +428,7 @@ int main()
 
                         drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
                         glDepthMask(GL_TRUE);
-
                     }
-
                     glm::vec3 lampPos3[] = {
                     {-4.9f,1.5f,-1.0f},{-4.9f,1.5f,1.0f}
                     };
@@ -458,33 +439,22 @@ int main()
                         drawCube(lamp, view, proj, program, glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
                     }
             };
-
                     drawRooms();
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.05f, 10.0f)),glm::vec3(60.0f, 0.05f, 15.0f)),
                         view, proj, program,{ 0.15f, 0.15f, 0.15f, 1.0f });
-
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.0f, 4.5f)),glm::vec3(40.0f, 0.1f, 1.0f)),
                         view, proj, program,{ 0.6f, 0.6f, 0.6f, 1.0f });
-
                     drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.0f, 18.0f)),glm::vec3(40.0f, 0.1f, 1.0f)),
                         view, proj, program,{ 0.6f, 0.6f, 0.6f, 1.0f } );
-
-
                     drawCube(glm::scale( glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.0f, 3.51f)),glm::vec3(40.0f, 0.1f, 0.98f)),
                         view, proj, program,{ 0.2f, 0.6f, 0.2f, 0.7f } );
-
                     drawCube(glm::scale( glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.0f, 20.5f)),glm::vec3(40.0f, 0.1f, 4.0f)),
                         view, proj, program,{ 0.2f, 0.6f, 0.2f, 0.7f });
-
                     for (float x = -6.8f; x <= 32.0f; x += 4.6f)
                     {
                         drawTree(glm::vec3(x, -1.0f, 3.6f), view, proj, program);
-
                         drawTree(glm::vec3(x, -1.0f, 20.0f), view, proj, program);
                     }
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
