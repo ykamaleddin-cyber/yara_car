@@ -432,7 +432,7 @@ int main()
 
                     drawRooms();
 
-                    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.05f, 10.0f)),glm::vec3(60.0f, 0.05f, 12.0f)),
+                    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.05f, 10.0f)),glm::vec3(60.0f, 0.05f, 15.0f)),
                         view, proj, program,{ 0.15f, 0.15f, 0.15f, 1.0f });
 
 
