@@ -24,13 +24,20 @@ void drawCube(glm::mat4 model, glm::mat4 view, glm::mat4 proj, GLuint program, g
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
+
 void drawTree(glm::vec3 pos, glm::mat4 view, glm::mat4 proj, GLuint program)
 {
-    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos),glm::vec3(0.3f, 1.5f, 0.3f)),
-        view, proj, program,{ 0.4f, 0.25f, 0.1f, 1.0f });
+    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 0.65f, 0.0f)),glm::vec3(0.5f, 2.5f, 0.2f)),  
+        view, proj, program, { 0.55f, 0.27f, 0.07f, 1.0f });  
 
-    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0, 1.3f, 0)),glm::vec3(1.2f, 1.2f, 1.2f)),
-        view, proj, program,{ 0.2f, 0.6f, 0.2f, 1.0f } );
+    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 1.5f, 0.0f)),glm::vec3(1.1f, 0.7f, 0.9f)), 
+        view, proj, program, { 0.0f, 0.6f, 0.0f, 1.0f });
+
+    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 2.1f, 0.0f)),glm::vec3(0.9f, 0.7f, 0.8f)),
+        view, proj, program, { 0.0f, 0.7f, 0.0f, 1.0f });
+
+    drawCube(glm::scale(glm::translate(glm::mat4(1.0f), pos + glm::vec3(0.0f, 2.7f, 0.0f)),glm::vec3(0.7f, 0.7f, 0.6f)),
+        view, proj, program, { 0.0f, 0.8f, 0.0f, 1.0f });
 }
 
 int main()
@@ -163,8 +170,10 @@ int main()
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) ), glm::vec3(3, 2, t1)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                glDepthMask(GL_FALSE);
                 drawCube( glm::scale( glm::translate( glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f)),glm::vec3(3.48f, 2.0f, t1) ),
                     view, proj, program,{ 0.4f, 0.7f, 0.9f, 0.35f } );
+                glDepthMask(GL_TRUE);
 
 
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) ), glm::vec3(0.05f, 2, 2)),
@@ -176,6 +185,7 @@ int main()
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 2) ), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
+
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(-5, 1, 0) ), glm::vec3(0.05f, 2, doorW1)),
                     view, proj, program, { 0.4f,0.7f,0.9f,0.35f });
 
@@ -233,7 +243,11 @@ int main()
                     glm::mat4 win = glm::translate(glm::mat4(1.0f), windows1[i] );
                     if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
                     else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                    glDepthMask(GL_FALSE);
+
                     drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                    glDepthMask(GL_TRUE);
+
                 }
               
                 glm::vec3 lampPos1[] = {
@@ -259,8 +273,11 @@ int main()
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) + glm::vec3(10, 0, 0)), glm::vec3(3, 2, t2)),
                     view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                glDepthMask(GL_FALSE);
+
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f) + glm::vec3(10, 0, 0)), glm::vec3(3.48f, 2.0f, t2)),
                     view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
+                glDepthMask(GL_TRUE);
 
                 drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(10, 0, 0)), glm::vec3(0.05f, 2, 2)),
                     view, proj, program, { 0.85f,0.85f,0.8f,1 });
@@ -323,7 +340,11 @@ int main()
                     glm::mat4 win = glm::translate(glm::mat4(1.0f), windows2[i] + glm::vec3(10, 0, 0));
                     if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
                     else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                    glDepthMask(GL_FALSE);
+
                     drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                    glDepthMask(GL_TRUE);
+
                 }
 
                 glm::vec3 lampPos2[] = {
@@ -348,8 +369,12 @@ int main()
                         view, proj, program, { 0.8f,0.8f,0.85f,1 });
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(3.5, 1, 3) + glm::vec3(20, 0, 0)), glm::vec3(3, 2, t3)),
                         view, proj, program, { 0.8f,0.8f,0.85f,1 });
+                    glDepthMask(GL_FALSE);
+
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(0.26f, 1.0f, 3.0f) + glm::vec3(20, 0, 0)), glm::vec3(3.48f, 2.0f, t3)),
                         view, proj, program, { 0.4f, 0.7f, 0.9f, 0.35f });
+                    glDepthMask(GL_TRUE);
+
 
                     drawCube(glm::scale(glm::translate(glm::mat4(1), glm::vec3(5, 1, -2) + glm::vec3(20, 0, 0)), glm::vec3(0.05f, 2, 2)),
                         view, proj, program, { 0.85f,0.85f,0.8f,1 });
@@ -416,7 +441,11 @@ int main()
                         glm::mat4 win = glm::translate(glm::mat4(1.0f), windows3[i] + glm::vec3(20, 0, 0));
                         if (i < 3) win = glm::scale(win, glm::vec3(1.5f, 1.0f, 0.05f));
                         else win = glm::scale(win, glm::vec3(0.05f, 1.0f, 1.5f));
+                        glDepthMask(GL_FALSE);
+
                         drawCube(win, view, proj, program, glm::vec4(0.4f, 0.7f, 0.9f, 0.35f));
+                        glDepthMask(GL_TRUE);
+
                     }
 
                     glm::vec3 lampPos3[] = {
@@ -449,14 +478,12 @@ int main()
                     drawCube(glm::scale( glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, -1.0f, 20.5f)),glm::vec3(40.0f, 0.1f, 4.0f)),
                         view, proj, program,{ 0.2f, 0.6f, 0.2f, 0.7f });
 
-
-                    for (float x = -6.5f; x <= 35.0f; x += 4.0f)
+                    for (float x = -6.8f; x <= 32.0f; x += 4.6f)
                     {
                         drawTree(glm::vec3(x, -1.0f, 3.6f), view, proj, program);
+
                         drawTree(glm::vec3(x, -1.0f, 20.0f), view, proj, program);
                     }
-
-
 
 
         glfwSwapBuffers(window);
